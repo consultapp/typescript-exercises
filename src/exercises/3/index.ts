@@ -20,33 +20,39 @@ interface User {
     name: string;
     age: number;
     occupation: string;
+    type: 'user';
 }
 
 interface Admin {
     name: string;
     age: number;
     role: string;
+    type: 'admin';
 }
 
 export type Person = User | Admin;
 
 export const persons: Person[] = [
     {
+        type: 'user',
         name: 'Max Mustermann',
         age: 25,
         occupation: 'Chimney sweep'
     },
     {
+        type: 'admin',
         name: 'Jane Doe',
         age: 32,
         role: 'Administrator'
     },
     {
+        type: 'user',
         name: 'Kate Müller',
         age: 23,
         occupation: 'Astronaut'
     },
     {
+        type: 'admin',
         name: 'Bruce Willis',
         age: 64,
         role: 'World saver'
@@ -55,7 +61,7 @@ export const persons: Person[] = [
 
 export function logPerson(person: Person) {
     let additionalInformation: string;
-    if (person.role) {
+    if (person.type === 'admin') {
         additionalInformation = person.role;
     } else {
         additionalInformation = person.occupation;

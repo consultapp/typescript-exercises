@@ -38,7 +38,7 @@ interface Admin {
 export type Person = User | Admin;
 
 export const persons: Person[] = [
-    { type: 'user', name: 'Max Mustermann', age: 25, occupation: 'Chimney sweep' },
+    {type: 'user', name: 'Max Mustermann', age: 25, occupation: 'Chimney sweep'},
     {
         type: 'admin',
         name: 'Jane Doe',
@@ -85,7 +85,7 @@ export function logPerson(person: Person) {
     console.log(` - ${person.name}, ${person.age}, ${additionalInformation}`);
 }
 
-export function filterUsers(persons: Person[], criteria: User): User[] {
+export function filterUsers(persons: Person[], criteria: Partial<Omit<Person, 'type'>>): User[] {
     return persons.filter(isUser).filter((user) => {
         const criteriaKeys = Object.keys(criteria) as (keyof User)[];
         return criteriaKeys.every((fieldName) => {
@@ -96,12 +96,9 @@ export function filterUsers(persons: Person[], criteria: User): User[] {
 
 console.log('Users of age 23:');
 
-filterUsers(
-    persons,
-    {
-        age: 23
-    }
-).forEach(logPerson);
+filterUsers(persons, {
+    age: 23
+}).forEach(logPerson);
 
 // In case if you are stuck:
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
