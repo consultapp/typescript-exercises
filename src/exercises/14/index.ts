@@ -43,6 +43,7 @@ Bonus:
  * @param {Array} input
  * @return {Array | Function}
  */
+
 export function map(mapper, input) {
     if (arguments.length === 0) {
         return map;
@@ -134,8 +135,8 @@ export function reduce(reducer, initialValue, input) {
                     return subSubInput.reduce(reducer, subInitialValue);
                 };
             }
-            return subInput.reduce(reducer,subInitialValue);
-        }
+            return subInput.reduce(reducer, subInitialValue);
+        };
     }
     if (arguments.length === 2) {
         return function subFunction(subInput) {

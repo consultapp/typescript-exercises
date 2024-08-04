@@ -52,28 +52,43 @@ interface Admin {
 type Person = User | Admin;
 
 const admins: Admin[] = [
-    { type: 'admin', name: 'Jane Doe', age: 32, role: 'Administrator' },
-    { type: 'admin', name: 'Bruce Willis', age: 64, role: 'World saver' }
+    {type: 'admin', name: 'Jane Doe', age: 32, role: 'Administrator'},
+    {type: 'admin', name: 'Bruce Willis', age: 64, role: 'World saver'}
 ];
 
 const users: User[] = [
-    { type: 'user', name: 'Max Mustermann', age: 25, occupation: 'Chimney sweep' },
-    { type: 'user', name: 'Kate Müller', age: 23, occupation: 'Astronaut' }
+    {type: 'user', name: 'Max Mustermann', age: 25, occupation: 'Chimney sweep'},
+    {type: 'user', name: 'Kate Müller', age: 23, occupation: 'Astronaut'}
 ];
 
-export type ApiResponse<T> = (
-    {
-        status: 'success';
-        data: T;
-    } |
-    {
-        status: 'error';
-        error: string;
-    }
-);
+export type ApiResponse<T> =
+    | {
+          status: 'success';
+          data: T;
+      }
+    | {
+          status: 'error';
+          error: string;
+      };
 
-export function promisify(arg: unknown): unknown {
-    return null;
+export type OldCallback<T> = (response: ApiResponse<T>) => void;
+export type OldApiFuction<T> = (callback: OldCallback<T>) => void;
+export type OldApiObject<T> = {[K in keyof T]: OldApiFuction<T[K]>};
+export type Promisify<T> = () => Promise<T>;
+export type PromisifyAll<T> = {[K in keyof T]: Promisify<T[K]>};
+
+export function promisify<T>(fn: OldApiFuction<T>): () => Promise<T> {
+    return () =>
+        new Promise<T>((resolve, reject) => {
+            fn((response) => {
+                if (response.status === 'success') resolve(response as T);
+                else reject(response);
+            });
+        });
+}
+
+export function promisifyAll<T extends {[key: string]: any}>(obj: OldApiObject<T>): PromisifyAll<T> {
+    return Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, promisify(v)])) as PromisifyAll<T>;
 }
 
 const oldApi = {
@@ -103,17 +118,17 @@ const oldApi = {
     }
 };
 
-export const api = {
-    requestAdmins: promisify(oldApi.requestAdmins),
-    requestUsers: promisify(oldApi.requestUsers),
-    requestCurrentServerTime: promisify(oldApi.requestCurrentServerTime),
-    requestCoffeeMachineQueueLength: promisify(oldApi.requestCoffeeMachineQueueLength)
-};
+export const api = promisifyAll(oldApi);
+
+// export const api = {
+//     requestAdmins: promisify(oldApi.requestAdmins),
+//     requestUsers: promisify(oldApi.requestUsers),
+//     requestCurrentServerTime: promisify(oldApi.requestCurrentServerTime),
+//     requestCoffeeMachineQueueLength: promisify(oldApi.requestCoffeeMachineQueueLength)
+// };
 
 function logPerson(person: Person) {
-    console.log(
-        ` - ${person.name}, ${person.age}, ${person.type === 'admin' ? person.role : person.occupation}`
-    );
+    console.log(` - ${person.name}, ${person.age}, ${person.type === 'admin' ? person.role : person.occupation}`);
 }
 
 async function startTheApp() {

@@ -1,11 +1,11 @@
-import 'date-wizard';
+// import 'date-wizard';
 
-declare module 'date-wizard' {
-    const pad: (ident: number) => string;
+// declare module 'date-wizard' {
+//     const pad: (ident: number) => string;
 
-    interface DateDetails {
-        hours: number;
-        minutes: number;
-        seconds: number;
-    }
-}
+//     interface DateDetails {
+//         hours: number;
+//         minutes: number;
+//         seconds: number;
+//     }
+// }
